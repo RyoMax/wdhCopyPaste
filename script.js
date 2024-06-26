@@ -1,3 +1,4 @@
+const body = document.querySelector("body")
 const divStart = document.querySelector('.start')
 const divIntro = document.querySelector('.intro')
 
@@ -21,7 +22,7 @@ let startTime
 
 
 
-function submitForm(e){
+function submitForm(e) {
     e.preventDefault()
 }
 
@@ -37,45 +38,70 @@ function setFocusAtStart(event) {
     textarea.selectionEnd = 0;
 }
 
-function start(){
-// Startet das erste Spiel, Intro ausgeblendet, Formular eingeblendet, der Timer gesetzt
+function start() {
+    // Startet das erste Spiel, Intro ausgeblendet, Formular eingeblendet, der Timer gesetzt
     divStart.classList.add("hide")
     divIntro.classList.add("hide")
     form.classList.remove('hide')
     startTime = Date.now()
-    textarea.value=eingabe
+    textarea.value = eingabe
+    hintModeOn()
 }
 
 
-function stop(){
-// Beendet Spiel, Timer gestoppt, Formular ausgeblendet, Zeit angezeigt
-   if (!ueberpruefeReihenfolge(textarea.value)) {
-    showWrongBox()
-   }else {
-    form.classList.add('hide')
-    finishDiv.classList.remove('hide')
-    stopTime=Math.trunc((Date.now()-startTime)/1000)
-    timeSpan.textContent=`${stopTime} s` 
-    let highH3 = finishDiv.querySelector('h3')
-    if (compareHighscore(stopTime)){
-       highH3.classList.remove('hide') 
+function stop() {
+    // Beendet Spiel, Timer gestoppt, Formular ausgeblendet, Zeit angezeigt
+    if (!ueberpruefeReihenfolge(textarea.value)) {
+        showWrongBox()
+        // bringt focus zurück zum Textfeld
+        let textarea = document.querySelector("textarea")
+        textarea.focus()
     } else {
-        highH3.classList.add('hide') 
+        form.classList.add('hide')
+        finishDiv.classList.remove('hide')
+        stopTime = Math.trunc((Date.now() - startTime) / 1000)
+        timeSpan.textContent = `${stopTime} s`
+        let highH3 = finishDiv.querySelector('h3')
+        if (compareHighscore(stopTime)) {
+            highH3.classList.remove('hide')
+        } else {
+            highH3.classList.add('hide')
+        }
     }
-   }
-    
+
 }
 
-function startAgain(){
-// Neues Spiel, Formular zurückgesetzt und eingeblendet, Timer erneut gestartet
-   
+function startAgain() {
+    // Neues Spiel, Formular zurückgesetzt und eingeblendet, Timer erneut gestartet
+
     finishDiv.classList.add('hide')
     divStart.classList.remove('hide')
     divIntro.classList.remove('hide')
 
-    startTime=Date.now()
+    startTime = Date.now()
     displayHighscore()
+    hintModeOff()
 }
+
+/* 
+    Hinweis Animation.
+    Setzt bei nicht-Fokus der TextArea eine animation über die ganze Seite, 
+    um es für den Nutzer so eindeutig wie möglich zu gestallten, 
+    dass dieser auf das Label klicken soll.
+ */
+    function hintModeOn() {
+        label = document.querySelector("label")
+        if (label) {
+            body.id = "hint-mode"
+        }
+    }
+    
+    /* 
+        Beendet die Hinweis Animation.
+    */
+    function hintModeOff() {
+        body.id = ""
+    }
 
 function ueberpruefeReihenfolge(eingabe) {
     // Zerlegt den Eingabestring in Blöcke
@@ -87,7 +113,7 @@ function ueberpruefeReihenfolge(eingabe) {
     }
     // console.log('Bloecke aus Eingabe: ', bloecke)
     // Sortiere die Blöcke nach ihrer Nummer und behandle Duplikate
-     const sortierteUndDuplizierteBloecke = bloecke
+    const sortierteUndDuplizierteBloecke = bloecke
         //  .sort((a, b) => a.nummer - b.nummer)
         .reduce((akk, block) => {
             akk.push(block.nummer);
@@ -107,27 +133,27 @@ function ueberpruefeReihenfolge(eingabe) {
     return istKorrekt;
 }
 
-function showWrongBox(){
+function showWrongBox() {
     wrongBox.classList.remove('hide')
     setTimeout(() => wrongBox.classList.add('hide'), 3000)
 }
 
 // Highscore functions
-function getHighscore(){
-   return localStorage.getItem('highscore-wdh-copy-paste')
+function getHighscore() {
+    return localStorage.getItem('highscore-wdh-copy-paste')
 }
 
-function setHighscore(newScore){
+function setHighscore(newScore) {
     localStorage.setItem('highscore-wdh-copy-paste', newScore)
 }
 
-function compareHighscore(newScore){
+function compareHighscore(newScore) {
     let highscore = getHighscore()
     if (!highscore) {
         setHighscore(newScore)
         return true
     } else {
-        if (highscore<newScore){
+        if (highscore < newScore) {
             return false
         } else {
             setHighscore(newScore)
@@ -136,11 +162,11 @@ function compareHighscore(newScore){
     }
 }
 
-function displayHighscore(){
+function displayHighscore() {
     let highscore = getHighscore()
-    if (highscore){
+    if (highscore) {
         highscoreContainer.classList.remove('hide')
-        highscoreContainer.querySelector('#score').textContent=highscore
+        highscoreContainer.querySelector('#score').textContent = highscore
     }
 }
 
